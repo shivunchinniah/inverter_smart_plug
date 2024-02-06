@@ -4,6 +4,10 @@ snapshot.json
 tinytuya.json
 tuya-raw.json
 
+error.txt
+log.txt
+data.txt
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
