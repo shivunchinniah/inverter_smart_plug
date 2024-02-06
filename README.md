@@ -21,3 +21,5 @@ Since the UPS has a relatively large battery of 200AH (12V) for a load of under 
 - tinytuya
 - python-dotenv
 - httpx
+- python-dateutil
+- pytz
