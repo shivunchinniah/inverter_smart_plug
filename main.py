@@ -66,7 +66,8 @@ def compute_on_state(now):
 
         next_load_shedding_start, next_load_shedding_end, stage = load_shedding_next_mins(now)
         
-        if(next_load_shedding_start < (2 * 60)):
+	    # Check if load shedding starts in the next five minutes
+        if(next_load_shedding_start < (5)):
             write_log("Load shedding. OFF")
             return False
 
