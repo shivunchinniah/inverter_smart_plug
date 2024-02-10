@@ -23,6 +23,7 @@ def load_shedding_next_mins():
 
     starts = []
     ends = []
+    stages = []
 
     with httpx.stream("GET", load_shedding_url, follow_redirects=True) as r:
         for row in csv.reader(r.iter_lines()):
@@ -30,10 +31,12 @@ def load_shedding_next_mins():
                 schedule.append(row)
                 starts.append(parser.parse(row[1]))
                 ends.append(parser.parse(row[2]))
+                stages.append(row[3])
 
 
     starts.sort()
     ends.sort()
+    
 
 
     now = datetime.now(tz=pytz.timezone(os.getenv('TIMEZONE'))) 
@@ -44,9 +47,16 @@ def load_shedding_next_mins():
 
     start_mins = (starts[index]-now).total_seconds() / 60
     end_mins = (ends[index]-now).total_seconds() / 60
+    next_stage = stages[index]
 
-    return start_mins, end_mins
 
+    for s in schedule:
+        print(s)
+
+    return start_mins, end_mins, 
+
+
+load_shedding_next_mins()
 
 
 

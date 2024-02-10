@@ -22,6 +22,7 @@ def load_shedding_next_mins(now=datetime.now()):
     schedule = []
     starts = []
     ends = []
+    stages = []
 
     with httpx.stream("GET", load_shedding_url, follow_redirects=True) as r:
         for row in csv.reader(r.iter_lines()):
@@ -29,6 +30,7 @@ def load_shedding_next_mins(now=datetime.now()):
                 schedule.append(row)
                 starts.append(parser.parse(row[1]))
                 ends.append(parser.parse(row[2]))
+                stages.append(row[3])
     starts.sort()
     ends.sort()
 
@@ -42,7 +44,7 @@ def load_shedding_next_mins(now=datetime.now()):
     start_mins = (starts[index]-now).total_seconds() / 60
     end_mins = (ends[index]-now).total_seconds() / 60
 
-    return start_mins, end_mins
+    return start_mins, end_mins, stages[index]
 
 def write_error(message):
     write_log_file(message, 'error.txt')
@@ -62,7 +64,7 @@ def compute_on_state(now):
     # if currently load shedding turn off
     try:
 
-        next_load_shedding_start, next_load_shedding_end = load_shedding_next_mins(now)
+        next_load_shedding_start, next_load_shedding_end, stage = load_shedding_next_mins(now)
         
         if(next_load_shedding_start < (2 * 60)):
             write_log("Load shedding. OFF")
@@ -81,6 +83,11 @@ def compute_on_state(now):
     # 6pm to 6am
    
     if(now.time() >= time(23,00) or now.time() <= time(6,00)):
+        
+        if(stage >=5):
+            write_log("Night time, but stage " + stage + ". ON")
+            return True
+        
         # night time is off time
         write_log("Night time. OFF")
         return False
@@ -128,7 +135,7 @@ if __name__ == '__main__':
 
     try:
 
-        next_load_shedding_start, next_load_shedding_end = load_shedding_next_mins()
+        next_load_shedding_start, next_load_shedding_end, stage = load_shedding_next_mins()
         write_log("Load shedding starts in {} hours, ends in {} hours.".format(next_load_shedding_start/60, next_load_shedding_end/60))
 
     except Exception as e:
